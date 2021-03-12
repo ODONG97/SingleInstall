@@ -12,3 +12,28 @@
 # 관리 옵션 : EM 체크 해제
 # 사용자 인증서 : 모든 계정에 동일한 비밀번호 사용
 # 생성 옵션 : 데이터베이스 생성 체크
+
+#DBCA Database File Location
+templates #pwd
+/oracle/app/database/assistants/dbca/templates
+
+Storage Type = File System
+Storge Locations : Use Database File Locations from Template
+
+Automatic Archiving
+Archive Log File Format : %t_%s_%r.arc => .arc로 확장자명 변경        /oracle/app/arch
+
+Install File
+Standard Database Components : Oracle JVM(System) / Oracle XML DB(SYSAUX)
+Memory : Typical 40% => 고객사 요청에 따라 변경 가능
+
+Sizing : block size=8192, Process : 변경 확인하기
+Character Sets = 언어 설정 -> 초기 설정 이후 변경 어려우니 확인 후 설정
+DB Install File 크기 늘리기 위해 커널 설정 이동 후 그와 맞는 크기로 설정
+
+DBCA 과정 이후 고객사에게 설치 결과 보고서 제출 파일 = inst_chk_db.sh
+
+Backspace = ^H 로 나올경우
+ㄴ SQL 접속 -> stty erase ^H
+
+SQL > select instance_name, status from v$instance; => Instance name과 OPEN 상태
