@@ -4,7 +4,7 @@
 # 생성 모드 : 고급 구성
 # 배치 유형 : 데이터베이스 유형(Oracle 단일 인스턴스 데이터베이스) -> 사용자 데이터베이스 체크
 # 데이터베이스 식별 : 전역 데이터베이스 이름(orcl), SID(orcl), 컨테이너 데이터베이스로 생성(체크 해제)
-# 저장 영역 옵션 : 데이터베이스 저장 영역 속성에 다음 사용
+# 저장 영역 옵션 : 데이터베이스 저장 영역 속성에 다음 사용, 파일 시스템
 # 빠른 복구 옵션 : 체크 해제(빠른 복구 영역 지정, 아카이브)
 # 네트워크 구성 : 새 리스너 생성 -> 리스너 이름(listener) , 리스너 포트(1521)
 # 데이터베이스 옵션 : Oracle [JVM,Text, Multimedia, OLAP, Spa~] = SYSAUX
@@ -47,3 +47,12 @@ Backspace = ^H 로 나올경우
 ㄴ SQL 접속 -> stty erase ^H
 
 SQL > select instance_name, status from v$instance; => Instance name과 OPEN 상태
+
+
+# dbca 내리고 올리기
+sp pfile 확인 : SQL > show parameter spfile; 
+sp 파일에서 p파일 복제 : create pfile from spfile;
+database 중지 : shutdown immediate
+exit
+vi /etc/hosts ## ip hostname 변경
+SQL > startup
