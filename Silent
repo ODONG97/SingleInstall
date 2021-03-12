@@ -1,0 +1,48 @@
+Silent 설치시 사전 체크에서 fail 항목이 있더라도 무시하고 설치를 진행하기 때문에 주의가 필요하다.
+
+response 파일 수정하여 설치
+ㄴ response 파일은 설치 미디어를 unzip 한 경로 아래 response 디렉토리 아래에 존재한다.
+
+[oracle@oraclehost response] $pwd
+/oramedia/database/response
+ls -al
+...
+
+db_install.rsp 를 수정한다. (Single 설치하는 데 있어 필요한 주요 옵션만 설명한다.)
+oracle.install.option : INSTALL_DB_SWONLY / INSTALL_DB_AND_CONFIG / UPGRADE_DB 중 택 1
+ORACLE_HOSTNAME : 지정하지 않으면 default 로 hostname 명령어의 결과값이다.
+UNIX_GROUP_NAME : Oracle SW를 설치하는 group 이름을 지정한다.
+INVENTORY_LOCATION : oraInventory 의 경로를 지정한다.
+SELECTED_LANGUAGES : Oracle SW가 지원하는 언어를 지정한다.
+ORACLE_HOME : Oracle Home 경로를 지정한다.
+ORACLE_BASE : Oracle Base 경로를 지정한다.
+oracle.install.db.InstallEdition : EE / SE / SEONE / PE (Windows Only) 중 택 1
+oracle.install.db.EEOptionsSelection : Enterprise Edition option 의 활성화 여후 (true / false) 를 지정한다.
+oracle.install.db.optionalComponents : Enterprise Edition option 를 설정한다.
+oracle.oraolap:11.2.0.4.0 - Oracle OLAP
+oracle.rdbms.dm:11.2.0.4.0 - Oracle Data Mining
+oracle.rdbms.dv:11.2.0.4.0 - Oracle Database Vault
+oracle.rdbms.lbac:11.2.0.4.0 - Oracle Label Security
+oracle.rdbms.partitioning:11.2.0.4.0 - Oracle Partitioning
+oracle.rdbms.rat:11.2.0.4.0 - Oracle Real Application Testing
+oracle.install.db.DBA_GROUP : SYSDBA권한을 가지고 OS 인증을 받는 그룹을 지정
+oracle.install.db.OPER_GROUP : SYSOPER권한을 가지고 OS 인증을 받는 그룹을 지정
+
+옵션 이름 중 db.config 라고 들어간 옵션은 install.option 에서 INSTALL_DB_AND_CONFIG 에 해당하므로 지금 설명에서 제외한다.
+
+SECURITY_UPDATES_VIA_MYORACLESUPPORT : MOS 와 연동하여 보안 이슈에 대한 정보를 받을 것인지에 대한 여부를 설정
+DECLINE_SECURITY_UPDATES : 네트워크를 통한 자동 PSU 를 받지 않을 것인지를 설정
+
+runInstaller 에서 -silent 와 -executePrereqs 옵션을 이용하여 사전체크를 진행한다.
+1. $ ./runInstaller -silent -executePrereqs
+2. $ ./runInstaller -silent -executePrereqs -responsefile <path>
+1번으로 사전체크를 진행할 시 모든 옵션이 기본값인 상태로 사전체크를 진행하며, 2번으로 사전체크를 진행할 시 response 파일에 설정한 값으로 사전체크를 진행한다.
+
+ACTION 또는 A log of this session 부븐에 동일한 경로로 사전체크의 결과가 기록된 로그를 확인할 수 있다.
+
+runInstaller 에서 -silent 와 -responsefile 옵션을 이용하여 설치를 진행한다.
+설치 진행 간 다른 옵션들도 이용할 수도 있다.
+-showProgress : 설치 진행도를 표시한다.
+-waitforcompletion : 설치가 완료될 때까지 설치 세션을 종료하지 않는다.
+-ignorePrereq : 사전체크에서 fail한 ignore 할 수 없는 항목도 무시하고 설치를 진행한다.
+
