@@ -1,0 +1,39 @@
+# Database RU Patch
+
+[OPatch Utility Update]
+# opatch version    // OPatch 버전 확인
+
+# mv $ORACLE_HOME/OPatch $ORACLE_HOME/OPatch_bak
+# unzip -q p6880880_190000_Linux-x86-64.zip -d $ORACLE_HOME
+# opatch version // 패치 된거 확인
+
+[DB RU Patch Pre-req check]
+# opatch prereq CheckConflictAgainstOHWithDetail -ph ./
+  Prereq "checkConflictAgainstOHWithDetail" passed.
+# opatch prereq CheckSystemspace -ph ./  
+   Prereq "checkSystemSpace" passed.
+
+[DB RU Patch apply]
+# opatch apply - y
+  ...
+  Patch 31771877 successfully applied.
+  ...
+  
+# OJVM Patch
+
+[OJVM Patch Pre-req check]
+# opatch prereq CheckConflictAgainstOHWithDetail -ph ./
+   Prereq "checkConflictAgainstOHWithDetail" passed.
+# opatch prereq CheckSystemspace -ph ./
+   Prereq "checkSystemSpace" passed.
+   
+[OJVM Patch apply]
+# opatch apply -y
+Patch 31668882 successfully applied.
+
+[Patch apply Check]
+# opatch lspatches
+31668882;OJVM RELEASE UPDATE: 19.9.0.0.201020 (31668882)
+31771877;Database Release Update : 19.9.0.0.201020 (31771877)
+
+(LISTENER PAGE로 이동)
