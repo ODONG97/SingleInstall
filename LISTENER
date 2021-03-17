@@ -1,0 +1,82 @@
+네트워크를 이용하여 클라이언트에서 오라클 서버로 연결하기 위한 오라클 네트워크 관리자 입니다. 
+로컬이 아닌 원격 데이터베이스 서버에 연결하기 위해선 원격에 있는 데이터베이스 리스너를 기동해야 하며 클라이언트에선 오라클 클라이언트가 
+설치되어 있고 오라클 서비스명(tnsnames.ora)을 만들어 접속해야 합니다.
+
+[설정 파일] - Listener 설정파일은 $ORACLE_HOME/network/admin/ 아래에 파일이 위치해 있습니다.
+
+● listener.ora
+Client가 Oracle 서버로 연결하기 위한 Oracle 서버에서 설정하는 Listener 구성 파일 입니다. 
+Oracle client에서 서버로 접속할 때 필요한 프로토콜 및 포트 정보등을 설정하는 파일 입니다.
+● tnsnames.ora
+Oracle 서버에서는 client의 프로토콜, 포트번호, 서버주소, 인스턴스등 접속 정보 파일 입니다.
+Client 에서는 Oracle 서버의 tnsnames.ora 에 등록한 서비스로만 통신 가능합니다.
+Oracle 서버와 client에 존재합니다.
+● sqlnet.ora
+Client가 오라클 서버로 접속할 때 인증, string naming 등 접속 방식을 설정하는 파일
+접속방식을 설정 하지 않아도 client에서 서버로 통신 및 접속이 가능합니다.
+
+[설치]
+- listener.ora파일은 Listener를 생성하면 파일이 생성됩니다.
+- listener.ora 파일을 수정하면 listener를 재로드 해야 합니다.
+- tnsnames.ora, sqlnet.ora 파일은 수동으로 생성하거나 $ORACLE_HOME/network/admin/sample 에 sample 파일이 있어 
+  copy 하여 수정해서 사용하면 됩니다.
+- 다중 인스턴스에 한 개의 Listener를 사용 할 수 있습니다.
+- lsnrctl 명령어로 Listener를 관리 할 수 있습니다.
+
+[Netca 실행]
+# netca
+
+1. Choose the configuration
+[Listener configuration] : Listener 설정
+[Naming Methods configuration] : sqlnet.ora 파일에 Directory Naming 설정
+[Local Net Service Name configuration] : TNS설정 (tnsnames.ora)
+[Directory Usage Configuration] : LDAP호환 디렉토리 서버 매핑 설정
+
+-	Listener를 생성 할 것이므로 [Listener configuration] 선택 후 Next
+
+2. Listener Configuration
+[Add] : 리스너 생성
+[Reconfigure] : 리스너 재구성
+[Delete] : 리스너 삭제
+[Rename] : 리스너 이름 변경
+
+-	신규 DB설치로 Listener가 한 개도 없어 add 버튼만 활성화 되어 있습니다.
+-	Add 선택
+
+3. name 설정
+-	기본 Listener 이름은 LISTENER 입니다.
+-	Listener 이름은 언더바( _ )를 제외한 특수문자는 사용할 수 없습니다.
+-	Listener 이름 설정 후 Next
+
+4. Protocol 선택
+ - Protocol 선택 후 Next
+ 
+5. Port 설정
+-	기본은 1521 포트이며, 1024 보다 낮은 포트를 사용할 경우 권한이 필요하며 65500까지 설정할 수 있습니다.
+- Use the standard port number of 1521 선택
+
+6. 추가 설정이 필요한지 확인
+-	리스너 한 개만 만들 것 이므로 NO 선택 후 Next
+
+7. 완료
+
+[LISTENER 확인]
+# lsnrctl status
+Alias LISTENER
+# ps -ef | grep tns
+LISTENER 떠 있나 확인
+
+(DBCA 문서로 이동)
+
+
+
+
+
+
+
+
+
+
+
+
+
