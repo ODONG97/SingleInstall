@@ -1,0 +1,207 @@
+# Oracle 11gR2 Install Guide
+
+이 문서는 Oracle 11gR2 Single Install Guide문서로, OS OL7 기준으로 작성하였습니다. 
+또한, Oracle 설치에 필요한 Requirement는 사전에 구성이 되어 있으며, X-window 설치가 되어있는 환경 기준으로 작성 하였습니다.
+
+# 서버 정보
+ [OS]
+  OracleLinux 7.0 64bit, RAM : 4G(Swap 8G)
+ [DB]
+  11gR2(11.2.0.1.0) Single Enterprise Edition
+ [DISK]
+  /oracle, /DATA, /ARCH
+ 
+# 환경 정보
+  - 오라클 설치 및 운영에 필요한 오라클 계정, 그룹 생성
+  - 디렉토리에 오라클 계정, 그룹 권한 부여
+  - Requirement에 나온 패키지는 미리 설치
+  
+# Install
+  
+   [Oracle Engine]
+    ./runInstaller
+    
+   [Step 1] - Configure Security Updates
+    Oracle support 받을 이메일 설정 -> 체크 해제 -> Next
+    이메일 받지 않으면 나오는 경고 메세지 Yes 누르고 진행 가능
+   
+   [Step 2] - Installation Option
+    Create and configure a database : DB Engine + DB 생성
+(*) Install database software only : DB Engine만 설치 
+    Upgrade an exisiting database : 버전 업그레이드
+    
+    [Step 3] - Grid Options
+ (*) Single instance database installation : Single instance 구성
+     Real Application clusters database installation : RAC 구성
+     
+    [Step 4] - Product Languages
+     English 선택 후 Next
+      
+    [Step 5] - Database Edition
+     Enterprise Edition 선택 후 Next
+     
+    [Step 6] - Installation Location
+     Oracle Base : 오라클 기본 디렉토리를 설정 ( /oracle )
+     Software Location : $ORACLE_HOME 경로, DB 엔진 경로 설정 ( /oracle/product/11.2.0.4 )
+     
+    [Step 7] - Create Inventory
+     Inventory Directory : /oracle/orainventory
+     oraInventory Group Name : dba
+     
+      if)
+       [INS-32055] The Central Inventory is located in the Oracle base
+                   Are you sure you want to continue?
+       -> Oracle base에 Inventory가 설정되어 있어 발생하는 메세지
+       권고 사항 : Starting from 11gR2 the product team is recommending to define Oracle_Base and the 
+                   central oraInventory directory outside of the users home directory.
+                   -> Yes 체크
+                   
+     [Step 8] - Installing database
+      OSDBA : dba
+      OSOPER : dba
+      
+     [Step 9] - Installing database
+      자동으로 OS에 설치 된 패키지 확인
+      가능하다면 필요한 모든 패키지 설치해주기
+      
+       *Error*
+       -> Error in invoking target 'agent nmhs' of makefile 
+          '/oracle/product/11.2.0.4/sysman/lib/lns_emagent.mk'. See
+          '/oracle/oraInventory/logs/InstallActionsYYYY-MM-DD_HH-MM-SSPM.log'
+          for detals.
+          
+       설치 시 해당 에러 발생 시 아래와 같이 진행 ( Doc ID 2299494.1 )
+       
+       cd $ORACLE_HOME/sysman/lib
+       vi ins_emagent.mk
+       
+       #=======
+       # emdctl
+       #=======
+       $(SYSMANBIN) emdctl :
+          $(MK_EMAGENT_NMECTL)      // 이 라인에 -lnnz11 입력
+          
+     [Step 10] - Installing Database
+      Save Reponse File 확인
+      
+      Execute Configuration scripts
+       1. /oracle/orainventory/orainstRoot.sh
+       2. /oracle/product/11.2.0.4/root.sh
+       
+       -> To execute the configuration scripts에 나온 순서대로 진행(root 계정)
+        
+       
+       1. /oracle/orainventory/orainstRoot.sh 수행
+       2. /oracle/product/11.2.0.4/root.sh 수행
+     
+     
+# Database(DBCA)
+  
+   [welcome]
+    Next 선택
+   
+   [Step 1]
+   (*) Create a Database : 새로운 DB 생성
+       Manage Templates : Templates 관리
+   
+   [Step 2]
+    General Purpose or Transaction Processing : 일반적 범용적 구성, 데이터파일 포함
+(*) Custom Database : Datafile 사이즈 변경 등 수동으로 구성
+    Data Warehouse : OLAP에서 데이터 분석을 위한 Data Warehouse, 데이터파일 포함
+    
+   [Step 3]
+    Global database name : Database 식별 ID (ORCL)
+    SID : Instance 식별 ID (ORCL)
+    
+   [Step 4]
+    Enterprise Manager
+     Configure Enterprise Manager 체크 해제
+    Automatic Maintenance Tasks
+     Enable automatic maintenance tasks 체크 해제
+    
+   [Step 5]
+    Use different administrative passwords : SYS/SYSTEM 계정 패스워드를 다르게 설정할 경우 선택
+ (*)Use the sam administrative password for all accounts : SYS/SYSTEM 계정 패스워드를 같게 설정할 경우 선택
+     -> 암호 복잡도를 충족하지 못했을 경우 발생하는 경고문 Yes 선택 후 진행
+
+   [Step 6]
+    Storage Type : File SYstem
+    Storage Locations
+     Use Database File Locations from Template.
+  (*)Use Common Location for All Database Files     Database Files Locations : /DATA
+     Use Oracle-Managed Files
+     
+   [Step 7]
+    Specify Fast Recovery Area : Fast Recovery Area (FRA)설정
+ (*)Enable Archiving : archive log mode 설정, DB 생성 후 수동으로 가능 합니다. -> Edit Archive Mode Parameters 경로 지정
+ -> (*)Automatic Archiving
+        Archive Log File Format %t_%s_%r.arc
+         1 /ARCH
+
+   [Step 8]
+    DB components의 Tablespace 지정 -> Standard Database Components 선택
+     (*) Oracle JVM : SYSTEM
+     (*) Oracle XML DB : SYSAUX
+     
+   [Step 9]
+   
+    [Memory]
+    (*) Typical - Memory Size(SGA and PGA) : 1478 MB=40%
+    (*) Use Automatic Memory Management : SGA 뿐 아니라 PGA 까지 자동으로 관리
+    
+    [Sizing]
+    Block size : Oracle Data의 가장 최소 작업 단위(block)의 size로서, 8K가 default로 설정되며, OS block을 한 개 이상 합쳐서 생성됩니다.
+                 Block Size : 8192 Bytes
+    Processes : 하나의 서버에 동시에 접근 할 수 있는 유저 프로세스로 Oracle에 접속 할 때 마다 생성됨, 설치 후 파라미터로 변경 가능 합니다.
+                Processes : 300
+  
+    [Character Sets]
+    (*) Choose from the list of character sets : Use Unicode(AL32UTF8) - 지원 하는 Characterset list
+        (*) Show recommended character sets only
+         National Character Set : AL16UTF16
+         Default Language : American
+         Default Territory : Unites States
+        
+   [Step 10] : 설정 값 확인 후 Next
+   
+   [Step 11]
+   (*) Create database : 설정 값을 가지고 DB를 생성, 생성 후에 실행하고 하는 스크립트가 있으면 Post DB creation scripts에 경로 입력
+       Save as a database template : 설정 값을 가지고 템플릿으로 저장, clone DB를 구성할 경우 사용할 수 있습니다..
+   (*) Generate database creation scripts : 설정 값을 가지고 script 생성, 추후 매뉴얼하게 DB생성 할 경우 script를 이용하면 됩니다.
+   
+   Password Management : 패스워드 설정 확인 및 수정 가능하며 SYS/SYSTEM은 나오지 않습니다. 설정 및 수정 확인 후 Exit  클릭합니다.
+   
+   [프로세스 통해 설치 확인]
+   
+   ps -ef | grep -i smon
+   ps -ef | grep -i pmon
+   
+# Listener
+
+  [Welcome]
+(*) Listener configuration : Listener 설정
+    Naming Methods configuration : sqlnet.ora 파일에 Directory Naming 설정
+    Local Net Service Name configuration : TNS설정 (tnsnames.ora)
+    Directory Usage Configuration : LDAP호환 디렉토리 서버 매핑 설정
+    
+(*) Add : 리스너 생성
+    Reconfigure : 리스너 재구성
+    Delete : 리스너 삭제
+    Rename : 리스너 이름 변경
+    
+    Listener name : LISTENER
+    
+    [Protocol Select]
+    Avaliable Protocols : TCPS, IPC
+    Selected Protocols : TCP
+    
+(*) Use the standard port number of 1521
+    Use another port number 
+    
+(*) NO
+    Yes
+    
+    Next -> Finish
+    
+    [정상 기동 확인]
+    ps -ef | grep -i tns
