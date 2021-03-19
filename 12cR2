@@ -1,0 +1,147 @@
+# 12cR2(12.2.0.1), Platform = RHEL6, Single instance
+
+# 설치 서버 정보
+ [OS]
+  RHEL 6.8 64bit, RAM : 2G(swap 4G)
+ [DB]
+  12cR2(12.2.0.1) Single Enterprise Edition
+ [Disk]
+  /oracle (10G) /oradata(10G)
+ 
+# 환경 정보
+ Oracle Software 설치를 위한 계정, 그룹 설정
+ 설치 될 디렉토리에 계정의 write 권한이 있어야 함
+ 
+# 파일 정보
+ [oraInst.loc]
+  inventory 경로정보와 그룹 안의 구성원들이 인벤토리에 쓸 수 있는 그룹 정보가 있습니다. 
+  Linux, AIX - /etc/ , Solaris, HP-UX - /var/opt/oracle/ , Window Server - HKEY_LOCAL_MACHINE/Software
+  /Oracle/ 에 생성되며, Engine이 설치되면 ORACLE_HOME 밑에도 생성 됩니다.
+  
+ [oratab]
+  해당 DB의 정보(DB를 식별함에 있어 고유한 아이디인 SID(instance name) 정보와 오라클이 설치된 경로가 있고, 
+  자동시작 기능 여부를 설정 할 수 있습니다.  
+  
+ [oraInventory]
+  Oracle Software 제품의 관한 정보와, 서버에 설치 되어 있는 Oracle_HOME에 대한 내용을 XML형태로 존재하는 파일입니다.
+  
+ [ORCLfmap]
+  Root.sh를 실행하면 파일매핑(fmputl, fmputlhp) 유틸리티를 $ORACLE_HOME/bin , /opt/ORCLfmap
+  /port1_<word_size>/bin 설치 합니다. 모든 레벨의 I/O 스택을 통해 맵핑 정보를 얻어 일부 platform 에서는 root 권한을 갖습니다.
+  
+# Oracle Engine
+ Oracle Engine이란 Oracle Software를 말합니다. 즉, DB를 생성하고 관리해주는 소프트웨어입니다. 
+ 이러한 Engine은 버전별로 서버에 설치 할 수 있으며, 엔진별로 계정이 있어야 합니다.
+ 
+# 미디어 정보
+ [OS]
+  RHEL 6.8 64bit, RAM : 2G(swap 4G)
+ [DB]
+  12cR2(12.2.0.1) Single Enterprise Edition
+ [Disk]
+  /oracle(10G) /oradata(10G)
+  
+# 설치
+ 해당 설치는 OUI 방식으로 x-window가 설치되어야 합니다.
+  - Oracle 계정에 profile에 환경변수를 설정하면 profile을 읽어 정보를 보여줍니다.
+  - Oracle 계정으로 runInstaller 를 실행합니다. 미리 DISPLAY를 설정해야 합니다. (export DISPLAY=)
+  
+./runInstaller
+
+1. Configure Security Updates
+-	Product support 받을 이메일을 설정합니다. (Security Issue 내용을 메일로 보내줍니다)
+-	Oracle Support와 연동을 시킬 것인 묻는 항목이며, 계정이 없으면 체크 해제
+-	NEXT 선택
+- 이메일, Support 연동을 하지 않을 경우 묻는 경고 메세지 -> Yes 선택
+
+2. Installation Option
+- Install Option 선택란
+ - [Create and configure a database] : DB Engine + DB 생성
+ - [Install database software only] : DB Engine만 설치
+ - [Upgrade an existing database] : 버전 업그레이드 설치
+ - DB 생성도 할 것이지만 절차대로 진행 할 것이기 때문에 Install database software only 선택
+ 
+3. Database Installation Options
+ - Database Install Type 선택란
+  - [Single instance database installation] : Single instance 구성 시 사용
+  - [Oracle Real Application clusters database installation] : RAC 구성 시 사용
+  - [Oracle RAC One Node database installation] : RAC One Node 구성 시 사용
+  
+4. Database Edition
+ - Edition 선택
+  [Enterprise Edition] : 4CPU 이상 확장 가능한 서버에 설치 가능
+  [Standard Edition 2] : 기존의 Standard Edtition, Standard Edition One 이 expired되고 새로 추가된 Edition으로 2CPU 까지만 
+                         지원하지만 16 CPU Threads 를 지원 합니다.
+   -	해당 edition은 edition별 지원 옵션, 특징이 다르며, edition은 변경 할 수 있으나, 구매한 라이센스로 선택합니다.
+   
+5. Installation Location
+ [Oracle base] : 오라클 설치 프로그램인 OUI를 저장하고, 오라클 트레이스 파일을 저장하는 디렉터리의 이름을 기록하는 
+                 오라클 환경 변수 명 입니다.
+ [Software location] : $ORACLE_HOME 위치, DB 엔진 설치 경로로 Oracle base와 경로가 같아도 무방 합니다.
+  -	유저 환경변수(profile)에서 설정하면 자동으로 표시가 됩니다.
+  -	디렉토리는 모두 oracle계정의 read/write 권한이 필요 합니다.
+  
+  [INS-32008] Oracle base location can't be same as the user home directory.
+  [INS-32056] The specified Oracle Base contains the existing Central Inventory location: /oracle/oraInventory
+  
+  - Oracle Base 위치가 oracle 계정의 홈디렉토리와 같은 경우
+  - Inventory 경로가 이미 $ORACLE_BASE에 포함 되어 있을 경우 뜨는 경고
+  - Yes 선택 후 Next
+  
+6. Privileged Operating System Groups - Group 설정
+ [OSDBA] : SYSDBA 권한
+ [OSOPER] : 운영체제 그룹 (선택)
+ [OSBACKUPDBA] : RMAN, SQL*PLUS 사용하는 sysbackup 권한
+ [OSDGDBA] : Data Guard 조작을 수행 하는 SYSDG 권한
+ [OSKMDBA] : 암호화 키 저장소 조작하는 SYSKM 권한
+ [OSRACDBA] : RAC 관리하는 SYSRAC 권한
+  - 각각의 그룹을 지정하여 설치를 권장하지만, 본문서는 하나의 그룹으로 통일
+  
+7. Perform Prerequisite Checks - Oracle Engine이 설치 가능한 최소 설치 환경 체크
+ -	OS Kenerl Parameters : OS kernel Parameter 값  
+ -	Packages : OS Package 
+ [Check Again] : 변경 된 사항을 다시 check (reload)
+ [Fix & Ceck Again] : OS Kernel Parameter 값을 설치에 필요한 최소값으로 변경 
+ Ignore All : 체크를 하게 되면 모두 무시하고 설치를 진행
+
+ -	Kernel Parameter 값은 network, shell limits 포함 되어 있습니다.
+ -	Package는 YUM을 이용하여 설치 하거나 wget을 이용하여 설치 합니다.
+ 
+참고 : Oracle Database (RDBMS) on Unix AIX, HP-UX, Linux, Solaris and MS Windows
+Operating Systems Installation and Configuration Requirements Quick Reference (12.1/12.2) 
+(문서 ID 1587357.1)
+
+ [INS-13016] You have chosen to ignore some of the prerequisites for this installation. This may impact product configuration.
+  - Ignore 선택시 계속 진행 할 것인지 여부 확인
+  - Details 확인 후 Yes 선택
+  
+8. Summary
+ - Save Response File : 해당 설정 값이 기록된 Response File을 만든다.
+  -> Response File을 만들 경로를 지정해 준 후 Save 선택
+  
+9. Install Product
+ - Details : 설치 순서를 자세하게 확인 가능하며, log file 위치를 확인하여 log 확인
+ - 설치가 완료 되면 위의 script를 root 유저로 실행 한 후 OK를 선택
+ - /etc/orainst.loc 파일이 없으면 (oracle을 설치 한 적 없거나 지웠을 경우) orainstRoot.sh 실행
+ 
+ - root.sh : oratab 생성, oracle 사용자를 위한 환경 변수 설정(dbhome, oraenv, coraenv)
+  -> /oracle/oraInventory/orainstRoot.sh (root user)
+ - orainstRoot.sh : oraInventory Permission, 그룹 변경 및 /etc/oraInst.loc가 없을 경우 생성
+  -> /oracle/app/122/root.sh (root user)
+ - Local bin directory 에 대한 path를 입력합니다. 아무것도 입력하지 않고 Enter를 누르면 /usr/local/bin 에 입력 됩니다.
+ -	Trace File Analyzer 설치 여부를 묻습니다. Enter를 누르면 설치하지 않습니다.
+
+ 
+ 
+  
+
+
+
+
+
+
+ 
+
+
+
+
